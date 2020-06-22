@@ -1,8 +1,42 @@
 const app = require("express")();
 var port_number = process.env.PORT || 4000;
-app.listen(port_number);
+var server = app.listen(port_number);
+var io = require('socket.io')(server);
 const cors = require("cors");
 const bodyParser = require("body-parser");
+var uids=[];
+
+var arr=[];
+
+io.on('connection', (socket) => {
+  console.log('new client connected!')
+  socket.on('datanode', (data) => {
+    console.log(data);
+    console.log(typeof(data));
+    var newnode = {
+      uid: data.uid,
+      wifissid1: data.wifissid1,
+      wifissid2: data.wifissid2,
+      d1: data.d1,
+      d2: data.d2,
+      xcoord: 0,
+      ycoord: 0,
+      x:2,
+      sector:0
+    }
+    arr.push(newnode)
+    console.log(newnode);
+    setInterval(function(){
+      if(arr.length>=4){
+        thisisfunction();
+        arr=[];
+        socket.emit("datatonode",uids)
+      }
+    },1000)
+    
+  });
+});
+
 
 var list = [
   {
@@ -148,11 +182,6 @@ function setsector(first, second) {
     else if (second == "BSCIPS6") return 3;
   }
 }
-async function running() {
-  for (let i = 0; i < 5; i++) {
-    list[i].sector = setsector(list[i].wifissid1, list[i].wifissid2);
-  }
-}
 
 async function thisisfunction() {
   var temp;
@@ -163,7 +192,6 @@ async function thisisfunction() {
   var cosb2;
   for (let i = 0; i < 5; i++) {
     list[i].sector = setsector(list[i].wifissid1, list[i].wifissid2);
-    // console.log(list[i].sector);
     t =
       (Math.pow(list[i].d2, 2) -
         (2 * list[i].x * list[i].x + list[i].d1 * list[i].d1)) /
@@ -195,6 +223,10 @@ async function thisisfunction() {
           list[i].status = 1;
           list[j].status = 1;
           console.log(`UID ${list[i].uid} & UID ${list[j].uid} too close!`);
+          var obj = {uid1:list[i].uid,uid2:list[2].uid};
+          console.log(obj)
+          uids.push(obj);
+          console.log(uids)
         } else {
           console.log("you are safe!");
         }
@@ -202,4 +234,3 @@ async function thisisfunction() {
     }
   }
 }
-thisisfunction();
