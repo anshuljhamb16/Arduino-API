@@ -9,8 +9,6 @@ var list = [
     uid: 1,
     wifissid1: "BSCIPS4",
     wifissid2: "BSCIPS5",
-    rssi1: "",
-    rssi2: "",
     d1: 3.6,
     d2: 3.5,
     xcoord: 0,
@@ -22,10 +20,8 @@ var list = [
     uid: 2,
     wifissid1: "BSCIPS5",
     wifissid2: "BSCIPS6",
-    rssi1: "",
-    rssi2: "",
-    d1: 4,
-    d2: 2,
+    d1: 4.0,
+    d2: 2.0,
     xcoord: 0,
     ycoord: 0,
     x: 2,
@@ -35,9 +31,7 @@ var list = [
     uid: 3,
     wifissid1: "BSCIPS5",
     wifissid2: "BSCIPS6",
-    rssi1: "",
-    rssi2: "",
-    d1: 4,
+    d1: 4.0,
     d2: 2.5,
     xcoord: 0,
     ycoord: 0,
@@ -48,8 +42,6 @@ var list = [
     uid: 4,
     wifissid1: "BSCIPS8",
     wifissid2: "BSCIPS9",
-    rssi1: "",
-    rssi2: "",
     d1: 2.5,
     d2: 3.5,
     x: 2,
@@ -61,8 +53,6 @@ var list = [
     uid: 5,
     wifissid1: "BSCIPS8",
     wifissid2: "BSCIPS9",
-    rssi1: "",
-    rssi2: "",
     d1: 2.5,
     d2: 2.5,
     x: 2,
@@ -173,13 +163,14 @@ async function thisisfunction() {
   var cosb2;
   for (let i = 0; i < 5; i++) {
     list[i].sector = setsector(list[i].wifissid1, list[i].wifissid2);
-    console.log(list[i].sector);
+    // console.log(list[i].sector);
     t =
       (Math.pow(list[i].d2, 2) -
         (2 * list[i].x * list[i].x + list[i].d1 * list[i].d1)) /
-      (2 * list[i].x * list[i].x);
-    cosb1 = (1 - Math.sqrt(3 - 2 * t * t)) / 2;
-    cosb2 = (1 + Math.sqrt(3 - 2 * t * t)) / 2;
+      (2 * list[i].x * list[i].d1);
+    cosb1 = (t - Math.sqrt(2 - t * t)) / 2;
+    cosb2 = (t + Math.sqrt(2 - t * t)) / 2;
+    console.log(t);
     if (cosb1 <= 1 && cosb1 >= -1) {
       b = Math.acos(cosb1);
     } else {
@@ -188,10 +179,14 @@ async function thisisfunction() {
     a = Math.asin((list[i].x + list[i].d1 * Math.cos(b)) / list[i].d2);
     list[i].xcoord = list[i].d1 * Math.sin(b);
     list[i].ycoord = list[i].d2 * Math.sin(a);
+    // console.log(Math.sin(b))
+    // console.log(Math.sin(a))
   }
   for (let i = 0; i < 5; i++) {
     for (let j = i + 1; j < 5; j++) {
       if (list[i].sector == list[j].sector) {
+        // console.log(list[i].ycoord)
+        // console.log(list[j].ycoord)
         temp = Math.sqrt(
           Math.pow(list[i].xcoord - list[j].xcoord, 2) +
             Math.pow(list[i].ycoord - list[j].ycoord, 2)
